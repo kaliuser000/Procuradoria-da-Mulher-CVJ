@@ -201,6 +201,10 @@
 <body>
     <div class="container">
         <div class="header">
+            <video class="assistant-avatar" autoplay loop muted playsinline>
+                <source src="https://mixkit.imgix.net/videos/preview/mixkit-womans-portrait-in-a-studio-9773-large.mp4?q=80&amp;auto=format%2Ccompress&amp;h=540" type="video/mp4">
+                Seu navegador não suporta a tag de vídeo.
+            </video>
             <div>
                 <h1>💜 Assistente de Apoio</h1>
                 <p>Um espaço seguro para você.</p>
@@ -232,10 +236,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        // Por favor, substitua o texto abaixo pela sua chave de API real do Google AI Studio.
-        // A sua chave de API deve ficar entre as aspas duplas.
         const API_KEY = "AIzaSyCinmpn_0DZs-S1Mvd8HDEs3WSZ4gulb0A"; 
-
         const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=";
         const chatArea = document.getElementById('chatArea');
         const userInput = document.getElementById('userInput');
@@ -243,29 +244,21 @@
         const quickBtns = document.querySelectorAll('.quick-btn');
         let chatHistory = [];
 
-        // Esta é a nossa base de conhecimento interna para o RAG
         const knowledgeBase = {
             "lei maria da penha": "A Lei Maria da Penha (Lei nº 11.340/2006) é um marco no combate à violência contra a mulher. Ela define cinco tipos de violência doméstica e familiar: física, psicológica, sexual, patrimonial e moral. A lei cria mecanismos para prevenir e coibir a violência, estabelecendo medidas protetivas de urgência para a vítima. Ela também aumenta a pena para os agressores e prevê o encaminhamento da vítima e seus dependentes para programas de proteção.",
             "delegacia da mulher": "A Delegacia da Mulher (DEAM) é uma delegacia especializada no atendimento a mulheres vítimas de violência. Em Joinville, o endereço da DEAM é Rua Blumenau, s/n - Centro. As delegacias especializadas proporcionam um ambiente mais acolhedor e contam com profissionais treinados para lidar com a sensibilidade dos casos. Em casos de violência, você pode fazer um Boletim de Ocorrência (BO) e solicitar medidas protetivas.",
             "centro de referencia": "O Centro de Referência para a Mulher de Joinville (CRM) é um local que oferece atendimento social, psicológico e jurídico especializado. O CRM auxilia mulheres em situação de violência a construir um plano de vida para sair do ciclo de violência, oferecendo apoio e orientação. A equipe do CRM trabalha em conjunto com outros órgãos da rede de proteção para garantir a segurança e os direitos das mulheres."
         };
 
-        // Função para adicionar uma mensagem ao chat e rolar automaticamente
         function addMessage(message, isUser = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             messageDiv.innerHTML = isUser ? message : marked.parse(message);
             chatArea.appendChild(messageDiv);
-            
-            // Adicionado um pequeno atraso para garantir que a rolagem funcione
-            setTimeout(() => {
-                chatArea.scrollTop = chatArea.scrollHeight;
-            }, 500);
-
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
             return messageDiv;
         }
         
-        // Função para mostrar um indicador de digitação
         function showLoadingIndicator() {
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'message bot-message typing-indicator';
@@ -275,21 +268,18 @@
             return loadingDiv;
         }
 
-        // Função para remover o indicador de digitação
         function removeLoadingIndicator(indicator) {
             if (indicator) {
                 indicator.remove();
             }
         }
         
-        // Função para desabilitar os botões e o input
         function setUIEnabled(enabled) {
             userInput.disabled = !enabled;
             sendBtn.disabled = !enabled;
             quickBtns.forEach(btn => btn.disabled = !enabled);
         }
         
-        // Função para buscar dados relevantes do RAG
         function retrieveKnowledge(userMessage) {
             const lowerCaseMessage = userMessage.toLowerCase();
             for (const key in knowledgeBase) {
@@ -297,10 +287,9 @@
                     return knowledgeBase[key];
                 }
             }
-            return null; // Retorna nulo se não encontrar nada
+            return null;
         }
 
-        // Função principal para enviar a mensagem e obter a resposta da IA
         async function getResponseFromAPI(userMessage) {
             if (!API_KEY) {
                 addMessage("Por favor, insira sua chave de API no código para continuar. Você pode obter uma gratuitamente no Google AI Studio.");
@@ -311,10 +300,7 @@
             const loadingIndicator = showLoadingIndicator();
             
             try {
-                // Tenta buscar informações relevantes da base de conhecimento
                 const retrievedInfo = retrieveKnowledge(userMessage);
-
-                // Monta o prompt com a persona e, se houver, a informação do RAG
                 let prompt = `Você é uma assistente de apoio para mulheres, com o perfil da Procuradoria da Mulher da Câmara de Vereadores de Joinville. 
 Seja solidária, acolhedora e empática. Forneça informações claras e objetivas. 
 Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os seguintes contatos e links:
@@ -331,10 +317,15 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
                 }
                 
                 prompt += `A usuária disse: "${userMessage}"`;
-
                 chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
 
-                // Prepara a carga útil para a API
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [{ text: prompt }]
+                    }]
+                };
+
                 const response = await fetch(BASE_URL + API_KEY, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -365,23 +356,19 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
             }
         }
         
-        // Função para enviar a mensagem do input de texto
         function sendMessage() {
             const message = userInput.value.trim();
             if (message === '') return;
-            
             addMessage(message, true);
             userInput.value = '';
             getResponseFromAPI(message);
         }
         
-        // Função para enviar as mensagens rápidas
         function sendQuickMessage(message) {
             addMessage(message, true);
             getResponseFromAPI(message);
         }
         
-        // Função para lidar com a tecla Enter
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 sendMessage();
