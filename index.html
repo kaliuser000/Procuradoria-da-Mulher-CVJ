@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente de Apoio à Mulher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            height: 90vh; /* Aumentado para 90% da altura da tela */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #8b5a96, #a8708f);
+            color: white;
+            padding: 15px; /* Reduzido o padding */
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5em; /* Reduzido o tamanho da fonte */
+            margin: 0;
+        }
+        
+        .header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9ff;
+            display: flex;
+            flex-direction: column; /* Organiza as mensagens de cima para baixo */
+        }
+        
+        .message {
+            margin-bottom: 15px; /* Ajusta a margem para um visual mais limpo */
+            padding: 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
+        .bot-message {
+            background: linear-gradient(45deg, #e3f2fd, #f3e5f5);
+            border: 2px solid #ddd;
+            margin-right: auto;
+        }
+
+        .bot-message .loading-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #764ba2;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .bot-message .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .bot-message .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+        
+        .user-message {
+            background: linear-gradient(45deg, #8b5a96, #a8708f);
+            color: white;
+            margin-left: auto;
+        }
+        
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            position: sticky;
+            bottom: 0;
+            flex-wrap: wrap; /* Adicionado para quebrar a linha em telas pequenas */
+        }
+        
+        .input-area input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+        }
+        
+        .input-area input:focus {
+            border-color: #8b5a96;
+        }
+        
+        .send-btn {
+            background: linear-gradient(45deg, #8b5a96, #a8708f);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 90, 150, 0.4);
+        }
+        
+        .quick-options {
+            padding: 15px 20px;
+            background: #f0f0f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .quick-btn {
+            background: white;
+            border: 2px solid #8b5a96;
+            color: #8b5a96;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .quick-btn:hover {
+            background: #8b5a96;
+            color: white;
+        }
+        
+        .emergency {
+            background: #ff4757;
+            color: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .resources {
+            background: #2ed573;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💜 Assistente de Apoio</h1>
+            <p>Um espaço seguro para você.</p>
+        </div>
+        
+        <div class="emergency">
+            🚨 EMERGÊNCIA: Disque 180 (Central de Atendimento à Mulher) ou 190 (Polícia)
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message bot-message initial-message">
+                Olá! Sou sua assistente de apoio. Estou aqui para te ouvir e ajudar. Como posso te ajudar hoje?
+            </div>
+        </div>
+        
+        <div class="quick-options">
+            <div class="quick-btn" onclick="sendQuickMessage('Preciso de apoio emocional')">🤗 Apoio Emocional</div>
+            <div class="quick-btn" onclick="sendQuickMessage('Informações sobre meus direitos')">📚 Meus Direitos</div>
+            <div class="quick-btn" onclick="sendQuickMessage('Como buscar ajuda profissional')">👥 Buscar Ajuda</div>
+            <div class="quick-btn" onclick="sendQuickMessage('Técnicas de respiração')">🧘 Respiração</div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Digite sua mensagem..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        // Por favor, substitua o texto abaixo pela sua chave de API real do Google AI Studio.
+        // A sua chave de API deve ficar entre as aspas duplas.
+        const API_KEY = "AIzaSyCinmpn_0DZs-S1Mvd8HDEs3WSZ4gulb0A"; 
+
+        const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=";
+        const chatArea = document.getElementById('chatArea');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.querySelector('.send-btn');
+        const quickBtns = document.querySelectorAll('.quick-btn');
+        let chatHistory = [];
+
+        // Esta é a nossa base de conhecimento interna para o RAG
+        const knowledgeBase = {
+            "lei maria da penha": "A Lei Maria da Penha (Lei nº 11.340/2006) é um marco no combate à violência contra a mulher. Ela define cinco tipos de violência doméstica e familiar: física, psicológica, sexual, patrimonial e moral. A lei cria mecanismos para prevenir e coibir a violência, estabelecendo medidas protetivas de urgência para a vítima. Ela também aumenta a pena para os agressores e prevê o encaminhamento da vítima e seus dependentes para programas de proteção.",
+            "delegacia da mulher": "A Delegacia da Mulher (DEAM) é uma delegacia especializada no atendimento a mulheres vítimas de violência. Em Joinville, o endereço da DEAM é Rua Blumenau, s/n - Centro. As delegacias especializadas proporcionam um ambiente mais acolhedor e contam com profissionais treinados para lidar com a sensibilidade dos casos. Em casos de violência, você pode fazer um Boletim de Ocorrência (BO) e solicitar medidas protetivas.",
+            "centro de referencia": "O Centro de Referência para a Mulher de Joinville (CRM) é um local que oferece atendimento social, psicológico e jurídico especializado. O CRM auxilia mulheres em situação de violência a construir um plano de vida para sair do ciclo de violência, oferecendo apoio e orientação. A equipe do CRM trabalha em conjunto com outros órgãos da rede de proteção para garantir a segurança e os direitos das mulheres."
+        };
+
+        // Função para adicionar uma mensagem ao chat
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.innerHTML = isUser ? message : marked.parse(message);
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            return messageDiv;
+        }
+        
+        // Função para mostrar um indicador de digitação
+        function showLoadingIndicator() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message bot-message typing-indicator';
+            loadingDiv.innerHTML = 'Digitando<span class="loading-dot">.</span><span class="loading-dot">.</span><span class="loading-dot">.</span>';
+            chatArea.appendChild(loadingDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            return loadingDiv;
+        }
+
+        // Função para remover o indicador de digitação
+        function removeLoadingIndicator(indicator) {
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+        
+        // Função para desabilitar os botões e o input
+        function setUIEnabled(enabled) {
+            userInput.disabled = !enabled;
+            sendBtn.disabled = !enabled;
+            quickBtns.forEach(btn => btn.disabled = !enabled);
+        }
+        
+        // Função para buscar dados relevantes do RAG
+        function retrieveKnowledge(userMessage) {
+            const lowerCaseMessage = userMessage.toLowerCase();
+            for (const key in knowledgeBase) {
+                if (lowerCaseMessage.includes(key)) {
+                    return knowledgeBase[key];
+                }
+            }
+            return null; // Retorna nulo se não encontrar nada
+        }
+
+        // Função principal para enviar a mensagem e obter a resposta da IA
+        async function getResponseFromAPI(userMessage) {
+            if (!API_KEY) {
+                addMessage("Por favor, insira sua chave de API no código para continuar. Você pode obter uma gratuitamente no Google AI Studio.");
+                return;
+            }
+
+            setUIEnabled(false);
+            const loadingIndicator = showLoadingIndicator();
+            
+            try {
+                // Tenta buscar informações relevantes da base de conhecimento
+                const retrievedInfo = retrieveKnowledge(userMessage);
+
+                // Monta o prompt com a persona e, se houver, a informação do RAG
+                let prompt = `Você é uma assistente de apoio para mulheres, com o perfil da Procuradoria da Mulher da Câmara de Vereadores de Joinville. 
+Seja solidária, acolhedora e empática. Forneça informações claras e objetivas. 
+Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os seguintes contatos e links:
+- Delegacia Virtual da Mulher: https://delegaciavirtual.sc.gov.br/
+- Centro de Referência para a Mulher de Joinville (CRM): https://www.joinville.sc.gov.br/servicos/centro-de-referencia-para-mulher-de-joinville/
+- Centro de Valorização da Vida (CVV): 188 ou https://www.cvv.org.br/
+- OAB Joinville (Comissão da Mulher Advogada): https://oabjoinville.com.br/comissoes/comissao-da-mulher-advogada/
+- Emergência Policial: 190
+- Central de Atendimento à Mulher: 180
+`;
+
+                if (retrievedInfo) {
+                    prompt += `\n\nUse esta informação adicional para complementar sua resposta: "${retrievedInfo}"\n\n`;
+                }
+                
+                prompt += `A usuária disse: "${userMessage}"`;
+
+                chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+
+                // Prepara a carga útil para a API
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [{ text: prompt }]
+                    }]
+                };
+
+                // Realiza a chamada para a API da Google
+                const response = await fetch(BASE_URL + API_KEY, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro na API: ${response.status} ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const botResponse = result.candidates[0].content.parts[0].text;
+                    addMessage(botResponse);
+                } else {
+                    addMessage("Desculpe, não consegui gerar uma resposta. Por favor, tente novamente.");
+                }
+
+            } catch (error) {
+                console.error("Erro ao chamar a API:", error);
+                addMessage("Desculpe, não consegui me conectar com a assistente. Por favor, tente novamente mais tarde.");
+            } finally {
+                removeLoadingIndicator(loadingIndicator);
+                setUIEnabled(true);
+            }
+        }
+        
+        // Função para enviar a mensagem do input de texto
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+            
+            addMessage(message, true);
+            userInput.value = '';
+            getResponseFromAPI(message);
+        }
+        
+        // Função para enviar as mensagens rápidas
+        function sendQuickMessage(message) {
+            addMessage(message, true);
+            getResponseFromAPI(message);
+        }
+        
+        // Função para lidar com a tecla Enter
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
