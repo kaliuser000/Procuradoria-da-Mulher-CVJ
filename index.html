@@ -201,7 +201,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGIyZTBkZDBtY3M5b3g2eXJ2Z290ZDR2Ymd6c3Q4Z214eTRpY3Z5dGdmZjM5YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Ww3aXbF3vWw/giphy.gif" alt="Avatar do Assistente" class="assistant-avatar">
+            <video src="https://assets.mixkit.co/videos/preview/mixkit-beautiful-woman-in-a-studio-9773-small.mp4" alt="Avatar do Assistente" class="assistant-avatar" autoplay loop muted playsinline></video>
             <div>
                 <h1>💜 Assistente de Apoio</h1>
                 <p>Um espaço seguro para você.</p>
@@ -334,14 +334,6 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
                 chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
 
                 // Prepara a carga útil para a API
-                const payload = {
-                    contents: [{
-                        role: "user",
-                        parts: [{ text: prompt }]
-                    }]
-                };
-
-                // Realiza a chamada para a API da Google
                 const response = await fetch(BASE_URL + API_KEY, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -397,4 +389,5 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
     </script>
 </body>
 </html>
+
 
