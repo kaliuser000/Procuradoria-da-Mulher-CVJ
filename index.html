@@ -38,6 +38,10 @@
             color: white;
             padding: 15px; /* Reduzido o padding */
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; /* Espaçamento entre a imagem e o texto */
         }
         
         .header h1 {
@@ -49,6 +53,15 @@
             font-size: 0.9em;
             opacity: 0.9;
             margin: 0;
+        }
+
+        .assistant-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            object-fit: cover;
         }
         
         .chat-area {
@@ -188,8 +201,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>💜 Assistente de Apoio</h1>
-            <p>Um espaço seguro para você.</p>
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGIyZTBkZDBtY3M5b3g2eXJ2Z290ZDR2Ymd6c3Q4Z214eTRpY3Z5dGdmZjM5YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Ww3aXbF3vWw/giphy.gif" alt="Avatar do Assistente" class="assistant-avatar">
+            <div>
+                <h1>💜 Assistente de Apoio</h1>
+                <p>Um espaço seguro para você.</p>
+            </div>
         </div>
         
         <div class="emergency">
@@ -381,3 +397,4 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
     </script>
 </body>
 </html>
+
