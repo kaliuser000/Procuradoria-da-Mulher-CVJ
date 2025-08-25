@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente de Saúde Mental</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #8b5a96, #a8708f);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9ff;
+        }
+        
+        .message {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .bot-message {
+            background: linear-gradient(45deg, #e3f2fd, #f3e5f5);
+            border: 2px solid #ddd;
+            margin-right: auto;
+        }
+        
+        .user-message {
+            background: linear-gradient(45deg, #8b5a96, #a8708f);
+            color: white;
+            margin-left: auto;
+        }
+        
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-area input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+        }
+        
+        .input-area input:focus {
+            border-color: #8b5a96;
+        }
+        
+        .send-btn {
+            background: linear-gradient(45deg, #8b5a96, #a8708f);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 90, 150, 0.4);
+        }
+        
+        .quick-options {
+            padding: 15px 20px;
+            background: #f0f0f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .quick-btn {
+            background: white;
+            border: 2px solid #8b5a96;
+            color: #8b5a96;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .quick-btn:hover {
+            background: #8b5a96;
+            color: white;
+        }
+        
+        .emergency {
+            background: #ff4757;
+            color: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .resources {
+            background: #2ed573;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💜 Assistente de Apoio</h1>
+            <p>Um espaço seguro para você. Estou aqui para te ouvir e apoiar.</p>
+        </div>
+        
+        <div class="emergency">
+            🚨 EMERGÊNCIA: Disque 180 (Central de Atendimento à Mulher) ou 190 (Polícia)
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message bot-message">
+                Olá! Sou sua assistente de apoio. Este é um espaço seguro onde você pode compartilhar seus sentimentos e receber orientação. Como posso te ajudar hoje? 💜
+            </div>
+        </div>
+        
+        <div class="quick-options">
+            <div class="quick-btn" onclick="sendQuickMessage('Preciso de apoio emocional')">🤗 Apoio Emocional</div>
+            <div class="quick-btn" onclick="sendQuickMessage('Informações sobre meus direitos')">📚 Meus Direitos</div>
+            <div class="quick-btn" onclick="sendQuickMessage('Como buscar ajuda profissional')">👥 Buscar Ajuda</div>
+            <div class="quick-btn" onclick="sendQuickMessage('Técnicas de respiração')">🧘 Respiração</div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Digite sua mensagem..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        const responses = {
+            greetings: [
+                "Olá! Que bom que você está aqui. Como posso te apoiar hoje?",
+                "Oi! Este é um espaço seguro para você. O que está sentindo?",
+                "Seja bem-vinda! Estou aqui para te ouvir e apoiar. Como você está?"
+            ],
+            
+            emotional_support: [
+                "Entendo que você está passando por um momento difícil. Seus sentimentos são válidos e você não está sozinha. Que tal conversarmos sobre o que está te preocupando?",
+                "É normal sentir medo, raiva ou confusão nessas situações. Você foi muito corajosa ao buscar ajuda. Vamos juntas encontrar formas de te apoiar.",
+                "Lembre-se: você não é culpada por nada do que aconteceu. Você merece ser tratada com respeito e amor. Como posso te ajudar agora?"
+            ],
+            
+            rights_info: [
+                "Você tem direitos importantes: 🔹 Direito à vida sem violência 🔹 Proteção policial 🔹 Medidas protetivas 🔹 Assistência judiciária gratuita 🔹 Atendimento médico e psicológico. Quer saber mais sobre algum deles?",
+                "Lei Maria da Penha te protege! Você pode: denunciar sem medo, solicitar medidas protetivas, ter acompanhamento psicológico gratuito. O que mais gostaria de saber?"
+            ],
+            
+            help_seeking: [
+                "Existem várias formas de buscar ajuda: 🔹 Central 180 (24h) 🔹 Delegacias da Mulher 🔹 CRAS e CREAS 🔹 Casas de Abrigo 🔹 ONGs especializadas 🔹 Defensoria Pública. Qual tipo de ajuda você precisa?",
+                "Você pode procurar: Psicólogos especializados, grupos de apoio, assistentes sociais, advogados. Muitos serviços são gratuitos pelo SUS e órgãos públicos."
+            ],
+            
+            breathing: [
+                "Vamos fazer um exercício de respiração juntas: 1) Inspire devagar por 4 segundos 2) Segure por 4 segundos 3) Expire por 6 segundos 4) Repita 5 vezes. Você está se sentindo melhor?",
+                "Quando sentir ansiedade: respire fundo, conte até 10, coloque as mãos no peito e sinta sua respiração. Você está segura agora."
+            ],
+            
+            crisis: [
+                "Percebo que você está em uma situação de crise. Sua segurança é prioridade! 🚨 LIGUE AGORA: 180 ou 190. Se não puder ligar, procure imediatamente uma delegacia, hospital ou vizinho de confiança.",
+                "ATENÇÃO: Se você está em perigo AGORA, saia do local se possível e ligue 190. Se não puder sair, tente se trancar em um cômodo e pedir ajuda pelos vizinhos ou pelo telefone."
+            ]
+        };
+
+        function addMessage(message, isUser = false) {
+            const chatArea = document.getElementById('chatArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.innerHTML = message;
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function getResponse(userMessage) {
+            const msg = userMessage.toLowerCase();
+            
+            // Palavras de crise/emergência
+            if (msg.includes('emergência') || msg.includes('perigo') || msg.includes('socorro') || 
+                msg.includes('me bater') || msg.includes('vai me matar') || msg.includes('ameaça')) {
+                return responses.crisis[Math.floor(Math.random() * responses.crisis.length)];
+            }
+            
+            // Apoio emocional
+            if (msg.includes('apoio') || msg.includes('triste') || msg.includes('medo') || 
+                msg.includes('sozinha') || msg.includes('deprimida') || msg.includes('ansiedade')) {
+                return responses.emotional_support[Math.floor(Math.random() * responses.emotional_support.length)];
+            }
+            
+            // Informações sobre direitos
+            if (msg.includes('direitos') || msg.includes('lei') || msg.includes('maria da penha') || 
+                msg.includes('denúncia') || msg.includes('medida protetiva')) {
+                return responses.rights_info[Math.floor(Math.random() * responses.rights_info.length)];
+            }
+            
+            // Buscar ajuda
+            if (msg.includes('ajuda') || msg.includes('psicólogo') || msg.includes('delegacia') || 
+                msg.includes('onde ir') || msg.includes('procurar')) {
+                return responses.help_seeking[Math.floor(Math.random() * responses.help_seeking.length)];
+            }
+            
+            // Técnicas de respiração
+            if (msg.includes('respiração') || msg.includes('respirar') || msg.includes('calma') || 
+                msg.includes('relaxar')) {
+                return responses.breathing[Math.floor(Math.random() * responses.breathing.length)];
+            }
+            
+            // Cumprimentos
+            if (msg.includes('oi') || msg.includes('olá') || msg.includes('boa tarde') || 
+                msg.includes('boa noite') || msg.includes('bom dia')) {
+                return responses.greetings[Math.floor(Math.random() * responses.greetings.length)];
+            }
+            
+            // Resposta padrão
+            return `Entendo sua preocupação. Estou aqui para te apoiar. Pode me contar mais sobre o que está sentindo ou vivenciando? Lembre-se que você não está sozinha e que existem pessoas e lugares prontos para te ajudar. 💜
+            
+            <div class="resources">
+                📞 Central de Atendimento: 180<br>
+                🚨 Emergência: 190<br>
+                💬 Quer conversar sobre algo específico?
+            </div>`;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            addMessage(message, true);
+            input.value = '';
+            
+            setTimeout(() => {
+                const response = getResponse(message);
+                addMessage(response, false);
+            }, 1000);
+        }
+
+        function sendQuickMessage(message) {
+            addMessage(message, true);
+            setTimeout(() => {
+                const response = getResponse(message);
+                addMessage(response, false);
+            }, 1000);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
