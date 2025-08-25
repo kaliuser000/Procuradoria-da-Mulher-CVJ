@@ -334,6 +334,14 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
                 chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
 
                 // Prepara a carga útil para a API
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [{ text: prompt }]
+                    }]
+                };
+
+                // Realiza a chamada para a API da Google
                 const response = await fetch(BASE_URL + API_KEY, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
