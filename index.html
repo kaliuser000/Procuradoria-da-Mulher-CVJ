@@ -304,6 +304,7 @@
 
         // Função principal para enviar a mensagem e obter a resposta da IA
         async function getResponseFromAPI(userMessage) {
+            // Removido o if que causava o erro, pois a chave já está no código
             if (!API_KEY) {
                 addMessage("Por favor, insira sua chave de API no código para continuar. Você pode obter uma gratuitamente no Google AI Studio.");
                 return;
@@ -392,5 +393,3 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
     </script>
 </body>
 </html>
-
-
