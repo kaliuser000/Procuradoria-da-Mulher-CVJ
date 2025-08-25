@@ -242,10 +242,8 @@
             messageDiv.innerHTML = isUser ? message : marked.parse(message);
             chatArea.appendChild(messageDiv);
             
-            // Adicionado um pequeno atraso para garantir que a rolagem funcione
-            setTimeout(() => {
-                chatArea.scrollTop = chatArea.scrollHeight;
-            }, 500);
+            // Usamos scrollIntoView com 'smooth' para uma rolagem suave
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
 
             return messageDiv;
         }
@@ -256,7 +254,7 @@
             loadingDiv.className = 'message bot-message typing-indicator';
             loadingDiv.innerHTML = 'Digitando<span class="loading-dot">.</span><span class="loading-dot">.</span><span class="loading-dot">.</span>';
             chatArea.appendChild(loadingDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
+            loadingDiv.scrollIntoView({ behavior: 'smooth' });
             return loadingDiv;
         }
 
@@ -383,5 +381,3 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
     </script>
 </body>
 </html>
-
-
