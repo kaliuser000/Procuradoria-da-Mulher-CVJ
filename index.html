@@ -235,13 +235,18 @@
             "centro de referencia": "O Centro de Referência para a Mulher de Joinville (CRM) é um local que oferece atendimento social, psicológico e jurídico especializado. O CRM auxilia mulheres em situação de violência a construir um plano de vida para sair do ciclo de violência, oferecendo apoio e orientação. A equipe do CRM trabalha em conjunto com outros órgãos da rede de proteção para garantir a segurança e os direitos das mulheres."
         };
 
-        // Função para adicionar uma mensagem ao chat
+        // Função para adicionar uma mensagem ao chat e rolar automaticamente
         function addMessage(message, isUser = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             messageDiv.innerHTML = isUser ? message : marked.parse(message);
             chatArea.appendChild(messageDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
+            
+            // Adicionado um pequeno atraso para garantir que a rolagem funcione
+            setTimeout(() => {
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }, 100);
+
             return messageDiv;
         }
         
