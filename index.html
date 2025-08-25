@@ -201,7 +201,10 @@
 <body>
     <div class="container">
         <div class="header">
-            <video src="https://assets.mixkit.co/videos/preview/mixkit-beautiful-woman-in-a-studio-9773-small.mp4" alt="Avatar do Assistente" class="assistant-avatar" autoplay loop muted playsinline></video>
+            <video class="assistant-avatar" autoplay loop muted playsinline>
+                <source src="https://mixkit.imgix.net/videos/preview/mixkit-womans-portrait-in-a-studio-9773-large.mp4?q=80&amp;auto=format%2Ccompress&amp;h=540" type="video/mp4">
+                Seu navegador não suporta a tag de vídeo.
+            </video>
             <div>
                 <h1>💜 Assistente de Apoio</h1>
                 <p>Um espaço seguro para você.</p>
@@ -334,14 +337,6 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
                 chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
 
                 // Prepara a carga útil para a API
-                const payload = {
-                    contents: [{
-                        role: "user",
-                        parts: [{ text: prompt }]
-                    }]
-                };
-
-                // Realiza a chamada para a API da Google
                 const response = await fetch(BASE_URL + API_KEY, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -397,5 +392,3 @@ Responda diretamente à pergunta da usuária. Quando for relevante, ofereça os 
     </script>
 </body>
 </html>
-
-
