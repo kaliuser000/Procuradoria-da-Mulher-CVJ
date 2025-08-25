@@ -201,10 +201,6 @@
 <body>
     <div class="container">
         <div class="header">
-            <video class="assistant-avatar" autoplay loop muted playsinline>
-                <source src="https://mixkit.imgix.net/videos/preview/mixkit-womans-portrait-in-a-studio-9773-large.mp4?q=80&amp;auto=format%2Ccompress&amp;h=540" type="video/mp4">
-                Seu navegador não suporta a tag de vídeo.
-            </video>
             <div>
                 <h1>💜 Assistente de Apoio</h1>
                 <p>Um espaço seguro para você.</p>
@@ -261,8 +257,10 @@
             messageDiv.innerHTML = isUser ? message : marked.parse(message);
             chatArea.appendChild(messageDiv);
             
-            // Usamos scrollIntoView com 'smooth' para uma rolagem suave
-            messageDiv.scrollIntoView({ behavior: 'smooth' });
+            // Adicionado um pequeno atraso para garantir que a rolagem funcione
+            setTimeout(() => {
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }, 500);
 
             return messageDiv;
         }
@@ -304,7 +302,6 @@
 
         // Função principal para enviar a mensagem e obter a resposta da IA
         async function getResponseFromAPI(userMessage) {
-            // Removido o if que causava o erro, pois a chave já está no código
             if (!API_KEY) {
                 addMessage("Por favor, insira sua chave de API no código para continuar. Você pode obter uma gratuitamente no Google AI Studio.");
                 return;
